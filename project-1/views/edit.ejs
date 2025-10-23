@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <div class="main w-full min-h-screen bg-zinc-900 text-white p-10">
+        <a class="text-blue-500 underline inline-block mb-10" href="/">Go back to home</a>
+                
+          <form action="/editFeature" method="post">
+
+                <input name="previous" type="text"  value="<%= previousName%> "  class="block px-5 py-3 bg-zinc-800 w-1/4 rounded-md outline-none ">
+
+                <input name="new" type="text"  placeholder="new name" class="block px-5 py-3 mt-4 bg-zinc-800 w-1/4 rounded-md outline-none ">
+
+                 
+                <input type="submit" value="Update" class="mt-4 bg-yellow-400 text-black rounded p-2 font-semibold cursor-pointer">
+
+            </form>
+    </div>
+
+    <script src="/javascripts/script.js"></script>
+</body>
+
+</html>

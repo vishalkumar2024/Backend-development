@@ -1,0 +1,7 @@
+1. setting up parsers for forms
+
+2. setting up Ejs for Ejs pages
+   a> Install Ejs form npm
+   b> Setup Ejs as view engine
+
+3. setting up public static files

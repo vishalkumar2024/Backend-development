@@ -1,0 +1,1 @@
+there are two types of data base first is SQL and noSQL

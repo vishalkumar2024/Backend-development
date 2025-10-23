@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body>
+    <div class="main w-full min-h-screen bg-zinc-900">
+        <div class="form p-10 text-white">
+            <form action="/create" method="post">
+
+                <input name="title" type="text"  placeholder="Title goes here.." class="block px-5 py-3 bg-zinc-800 w-full rounded-md outline-none ">
+
+                <textarea name="details" placeholder="Write your task details" class="block px-5 py-3 bg-zinc-800 w-full resize-none mt-3 rounded-md outline-none "></textarea>
+
+                <input type="submit" value="Create task" class="mt-4 bg-white text-black rounded p-2 font-semibold cursor-pointer">
+
+            </form>
+        </div>
+
+        <div class="tasks p-10 flex flex-wrap gap-7">
+            <% if(allFiles.length>0){ %>
+                <% allFiles.forEach(function(val){ %>
+                    <div class="task bg-zinc-800 w-72 px-3 py-4 rounded-md">
+                        <h1 class="text-2xl text-white tracking-tighter">
+                            <%= val %>
+                        </h1>
+                        <div class="w-full  flex justify-between item-center mt-3">
+                            <a class="text-blue-500 underline my-2" href="/files/:<%= val %>">Read more..</a> %>
+                            
+                            <div class=" flex item-center">
+                                <a class=" bg-green-500 rounded-sm  text-centre py-2 px-2  " href="/edit/:<%= val %>">Edit </a>
+
+                                <a href="/delete/:<%= val %>" class=" bg-red-500 ml-2 rounded-sm  text-centre py-2 px-2 ">Remove</a>
+                            </div>
+                            
+                        </div>
+                      </div>
+                    <% }) %>
+                        <% } else{ %>
+                            <h1 class="text-zinc-600">No any Task yet</h1>
+                            <% } %>
+
+        </div>
+    </div>
+
+    <script src="/javascripts/script.js"></script>
+</body>
+
+</html>
