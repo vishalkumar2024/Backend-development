@@ -1,0 +1,40 @@
+Three things to learn 
+
+1. How to create/set, read a cookie .
+
+2. Use of Bcrypt and the use of encryption and decryption.
+   
+-> Encryption - Encryption is the process of converting plain text (readable
+   data) into cipher text (unreadable data) using an algorithm and a key.
+   The purpose is to protect data confidentiality, so that only authorized 
+   parties can read it.
+
+  Example:
+  If you encrypt “Hello” with a key, it might become something like XkZ8!v9Q.
+
+ ------Why to use----
+
+  1. To Protect Data Confidentiality - Encryption ensures that only authorized people (with the correct key) can read sensitive information
+
+  2. To Prevent Data Theft (During Transmission) - When data travels over the internet, it passes through multiple servers and networks, Without encryption, hackers can easily intercept and read it.
+
+  3. To Maintain Data Integrity - Encryption helps ensure that data isn’t altered or tampered with during transmission.
+
+  4. To Enable Secure Authentication - Encrypted tokens (like JWTs or OAuth tokens) help verify a user’s identity safely.
+
+
+-> Decryption - Decryption is the reverse process: turning cipher text back 
+   into plain text using a key. Only someone with the correct key (or secret)
+   can decrypt and read the original data.
+
+
+-> Bcrypt - bcrypt is a password hashing function designed to build secure 
+   password storage. Unlike regular encryption, bcrypt does not allow decryption
+   of passwords; instead, it makes it computationally expensive to guess the
+   original password from its hash.
+
+   bcrypt is a cryptographic algorithm that takes a plain-text password and turns it into a long, random-looking string (called a hash) — so even if your database is hacked, attackers can’t see users’ real passwords.
+
+-> Salting: bcrypt automatically generates a random salt (a string of random 
+   bytes) and combines it with the password.
+
