@@ -9,4 +9,4 @@ const userSchema = mongoose.Schema({
     age: Number,
 })
 
-module.export = mongoose.model("users", userSchema)
+module.exports = mongoose.model("users", userSchema)
