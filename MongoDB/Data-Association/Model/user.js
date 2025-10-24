@@ -6,7 +6,12 @@ const userSchema = mongoose.Schema({
     username: String,
     email: String,
     age: Number,
-    post: Array,
+    post: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'posts'
+        }
+    ],
 })
 
 module.exports = mongoose.model("users", userSchema)
