@@ -1,0 +1,6 @@
+In this mini Project------
+
+1. He/She can Login/Register, Logout.
+2. User can write post.
+3. anyone can like any post.
+4. logged in user can delete his post.
