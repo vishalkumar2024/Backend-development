@@ -17,7 +17,7 @@ app.set("view engine", "ejs")
 app.use(cookieParser())
 
 app.get('/', (req, res) => {
-    res.render("index")
+    res.render("index");
 })
 
 
@@ -62,7 +62,7 @@ app.post('/login', async (req, res) => {
             let token = jwt.sign({ email: email, userId: user._id }, "Secret");
             res.cookie("token", token);
 
-            res.status(200).send("You can login");
+            res.status(200).redirect("profile");
         }
         else res.redirect("/login")
     })
@@ -73,8 +73,21 @@ app.get('/logout', (req, res) => {
     res.redirect("/login")
 })
 
-app.get('/profile', isLoggedIn, (req, res) => { // '.profile' is a protected route by a middleware i.e isLoggedIn
-    res.send("you are in profile")
+app.get('/profile', isLoggedIn,async (req, res) => { // '.profile' is a protected route by a middleware i.e isLoggedIn
+    let ThisUser = await userModel.findOne({email:req.user.email}).populate("post")
+    res.render("profile", {user:ThisUser})
+})
+
+app.post('/post', isLoggedIn,async (req, res) => { // '.profile' is a protected route by a middleware i.e isLoggedIn
+    let ThisUser = await userModel.findOne({email:req.user.email})
+    let newPost = await postModel.create({
+        user:ThisUser._id,
+        content:req.body.content,
+    })
+
+    ThisUser.post.push(newPost._id)
+    await ThisUser.save();
+    res.redirect("/profile") 
 })
 
 
@@ -84,9 +97,10 @@ function isLoggedIn(req, res, next) {  //This is a middleware
     else {
         let data = jwt.verify(req.cookies.token, "Secret",)
         req.user = data
-        console.log(req.user)
         next();
     }
 }
 
-app.listen(3000)
+app.listen(3000,(err)=>{
+    if(err) console.log(err)
+})
