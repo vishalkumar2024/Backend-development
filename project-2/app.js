@@ -58,7 +58,7 @@ app.post('/login', async (req, res) => {
 
     bcrypt.compare(password, user.password, (err, result) => {
         if (result) {
-            
+
             let token = jwt.sign({ email: email, userId: user._id }, "Secret");
             res.cookie("token", token);
 
@@ -73,21 +73,34 @@ app.get('/logout', (req, res) => {
     res.redirect("/login")
 })
 
-app.get('/profile', isLoggedIn,async (req, res) => { // '.profile' is a protected route by a middleware i.e isLoggedIn
-    let ThisUser = await userModel.findOne({email:req.user.email}).populate("post")
-    res.render("profile", {user:ThisUser})
+app.get('/profile', isLoggedIn, async (req, res) => { // '.profile' is a protected route by a middleware i.e isLoggedIn
+    let ThisUser = await userModel.findOne({ email: req.user.email }).populate("post")
+    res.render("profile", { user: ThisUser })
 })
 
-app.post('/post', isLoggedIn,async (req, res) => { // '.profile' is a protected route by a middleware i.e isLoggedIn
-    let ThisUser = await userModel.findOne({email:req.user.email})
+app.post('/post', isLoggedIn, async (req, res) => { // '.profile' is a protected route by a middleware i.e isLoggedIn
+    let ThisUser = await userModel.findOne({ email: req.user.email })
     let newPost = await postModel.create({
-        user:ThisUser._id,
-        content:req.body.content,
+        user: ThisUser._id,
+        content: req.body.content,
     })
 
     ThisUser.post.push(newPost._id)
     await ThisUser.save();
-    res.redirect("/profile") 
+    res.redirect("/profile")
+})
+
+app.get('/like/:id', isLoggedIn, async (req, res) => {
+    let ThisPost = await postModel.findOne({ _id: req.params.id }).populate("user");
+
+    if (ThisPost.likes.indexOf(req.user.userId) == -1) {
+        ThisPost.likes.push(req.user.userId)
+    } else {
+        ThisPost.likes.splice(ThisPost.likes.indexOf(req.user.userId), 1)
+    }
+
+    await ThisPost.save();
+    res.redirect("/profile")
 })
 
 
@@ -101,6 +114,6 @@ function isLoggedIn(req, res, next) {  //This is a middleware
     }
 }
 
-app.listen(3000,(err)=>{
-    if(err) console.log(err)
+app.listen(3000, (err) => {
+    if (err) console.log(err)
 })
