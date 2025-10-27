@@ -40,9 +40,9 @@
                     </small>
                     <div class="my-2 ">
                         <a href="/like/<%=item._id%>" class="text-green-500 mr-4 cursor-pointer">
-                            <%= ( item.likes.length == 0)? "Like":"Unlike" %>
+                            <%= ( item.likes.indexOf(user._id) == -1)? "Like":"Unlike" %>
                         </a>
-                        <a href="" class="text-zinc-400 cursor-pointer">Edit</a>
+                        <a href="/edit/<%= item._id %>" class="text-zinc-400 cursor-pointer">Edit</a>
                     </div>
                 </div>
                 <% })%>

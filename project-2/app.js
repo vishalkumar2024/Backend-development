@@ -103,6 +103,19 @@ app.get('/like/:id', isLoggedIn, async (req, res) => {
     res.redirect("/profile")
 })
 
+app.get('/edit/:PostId', async (req, res) => {
+    let ThisPost = await postModel.findOne({ _id: req.params.PostId }).populate("user");
+    res.render("edit", ThisPost = { ThisPost })
+})
+
+app.post('/update/:postId', isLoggedIn, async (req, res) => {
+    let { content } = req.body;
+    await postModel.findOneAndUpdate({ _id: req.params.postId }, { content })
+
+    res.redirect('/profile')
+
+})
+
 
 
 function isLoggedIn(req, res, next) {  //This is a middleware
