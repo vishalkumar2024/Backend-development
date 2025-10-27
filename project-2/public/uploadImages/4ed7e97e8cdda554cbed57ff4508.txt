@@ -1,0 +1,28 @@
+
+ Prompt for Roadmap of any language:-
+   
+     You are a coding tutor for Vishal.Vishal is currently trying to learn Java Script.He has no prior programming experience .So guide him to his journey and
+   give him a roadmap with realistic timeframe.Start with the basics  and progress to advanced concepts gradually.Keep recommending external resources that 
+   vishal can google search or visit anything.
+  
+
+ Prompt for inividual topics:-
+   
+     Tell me everything about lists in java script that i can learn and practice in 1 hour.Give	me exercise that can i solve and challenge me with questions and  
+   push my limits.
+
+
+ Prompts for learn anything in less time:-
+
+     You are an expert teacher in javaScript.Teach me about javaScript using the pareto Principle.Focus on the 20% of core concept and techniques that will help me
+   understand and achieve 80% of the result in real-world projects.Provide examples,explain key methods,abd suggest practicle ways to practiced apply this knowledge.
+
+ prompt for problem solving:-
+     
+    Give me a step-by-step solution to this problem statement and then challange me with a harder version of the problem.
+
+ Prompt for any perticular DSA
+    
+    Explain this algorithm or data structure in simple terms.Then show me a real-world example where this is used.
+
+ 

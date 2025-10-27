@@ -5,6 +5,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
+const crypto = require('crypto')
 
 const userModel = require("./Model/user");
 const postModel = require("./Model/post");
@@ -16,7 +18,21 @@ app.use(express.static(path.join(__dirname, "public")))
 app.set("view engine", "ejs")
 app.use(cookieParser())
 
-app.get('/', (req, res) => {
+// Multer - DiskStorage
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/uploadImages')
+    },
+    filename: function (req, file, cb) {
+        crypto.randomBytes(14, (err, bytes) => { // crypto is a node package used to set  random texts
+            const fn = bytes.toString('hex') + path.extname(file.originalname)
+            cb(null, fn)
+        })
+    }
+})
+const upload = multer({ storage: storage })
+
+app.get('/', (req, res) => { 
     res.render("index");
 })
 
@@ -116,8 +132,6 @@ app.post('/update/:postId', isLoggedIn, async (req, res) => {
 
 })
 
-
-
 function isLoggedIn(req, res, next) {  //This is a middleware
     if (req.cookies.token === "") return res.send("You need to LogIn")
     else {
@@ -126,6 +140,17 @@ function isLoggedIn(req, res, next) {  //This is a middleware
         next();
     }
 }
+
+app.get('/file', (req, res) => {
+    res.render('file')
+})
+
+app.post('/uploadFile', upload.single('newFile'), (req, res) => { // post- uploadFile to handle upload files
+
+    console.log(req.file)
+    res.redirect('/file')
+
+})
 
 app.listen(3000, (err) => {
     if (err) console.log(err)
