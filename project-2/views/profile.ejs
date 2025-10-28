@@ -35,7 +35,7 @@
             <% user.post.reverse().forEach((item)=>{ %>
                 <div class="bg-zinc-800 inline-block border-2 border-zinc-700 w-[32%] p-4 mt-5 rounded ">
                     <h4 class="text-blue-500 mb-2">
-                        <%= user.username%>
+                        @<%= user.username%>
                     </h4>
                     <p class="tracking-tight text-white">
                         <%= item.content%>
@@ -47,7 +47,8 @@
                         <a href="/like/<%=item._id%>" class="text-green-500 mr-4 cursor-pointer">
                             <%= ( item.likes.indexOf(user._id)==-1)? "Like" :"Unlike" %>
                         </a>
-                        <a href="/edit/<%= item._id %>" class="text-zinc-400 cursor-pointer">Edit</a>
+                        <a href="/edit/<%= item._id %>" class="text-zinc-400 cursor-pointer mr-4">Edit</a>
+                        <a href="/delete/<%= item._id %>" class="text-red-400 cursor-pointer">Delete</a>
                     </div>
                 </div>
                 <% })%>

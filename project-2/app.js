@@ -129,6 +129,12 @@ app.post('/update/:postId', isLoggedIn, async (req, res) => {
 
 })
 
+app.get('/delete/:postId', isLoggedIn, async (req, res) => {
+    await postModel.findOneAndDelete({ _id: req.params.postId })
+    res.redirect('/profile')
+
+})
+
 app.get('/profilePic', (req, res) => {
     res.render('profilePic')
 })
