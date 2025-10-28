@@ -5,6 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const upload = require('./config/multerConfig')
 
 const userModel = require("./Model/user");
 const postModel = require("./Model/post");
@@ -17,35 +18,46 @@ app.set("view engine", "ejs")
 app.use(cookieParser())
 
 
-app.get('/', (req, res) => { 
+app.get('/', (req, res) => {
     res.render("index");
 })
 
-
 app.post('/register', async (req, res) => {
-    const { username, name, email, age, password } = req.body;
+    try {
+        const { username, name, email, age, password } = req.body;
 
-    let user = await userModel.findOne({ email });
-    if (user) return res.status(500).send("User already exist with this email");
+        // Check if user already exists
+        const ThisUser = await userModel.findOne({ email });
+        if (ThisUser)
+            return res.status(400).send("User already exists with this email");
 
-    bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(password, salt, async (err, hash) => {
-            let createdUser = await userModel.create({
-                username,
-                name,
-                email,
-                age,
-                password: hash,
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(password, salt, async (err, hash) => {
+                const createdUser = await userModel.create({
+                    username,
+                    name,
+                    email,
+                    age,
+                    password: hash,
+                });
+
+                const token = jwt.sign(
+                    { email: createdUser.email, userId: createdUser._id },
+                    process.env.JWT_SECRET || "Secret",
+                );
+
+                res.cookie("token", token, { httpOnly: true, secure: true });
+
+                res.render('profile', { user: createdUser })
             })
-
-            let token = jwt.sign({ email: email, userId: createdUser._id }, "Secret");
-            res.cookie("token", token);
-
-            res.send(createdUser)
-
         })
-    })
-})
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
 
 app.get('/login', (req, res) => {
     res.render("login")
@@ -115,6 +127,20 @@ app.post('/update/:postId', isLoggedIn, async (req, res) => {
 
     res.redirect('/profile')
 
+})
+
+app.get('/profilePic', (req, res) => {
+    res.render('profilePic')
+})
+
+app.post('/uploadFile', isLoggedIn, upload.single('newFile'), async (req, res) => {
+    let ThisUser = await userModel.findOne({ _id: req.user.userId }).populate("post");
+    if (req.file.filename) {
+        ThisUser.profilePicture = req.file.filename;
+        await ThisUser.save()
+    }
+
+    res.redirect('/profile')
 })
 
 function isLoggedIn(req, res, next) {  //This is a middleware
