@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express();
+require('dotenv').config();
 
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -158,7 +159,8 @@ function isLoggedIn(req, res, next) {  //This is a middleware
     }
 }
 
+const port = process.env.PORT || 4000;
 
-app.listen(3000, (err) => {
+app.listen(port, (err) => {
     if (err) console.log(err)
 })
