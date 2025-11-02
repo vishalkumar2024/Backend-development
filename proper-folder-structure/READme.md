@@ -1,0 +1,1 @@
+# Industry standard folder structure 
