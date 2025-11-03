@@ -17,9 +17,9 @@ app.use(express.static('public'))
 
 
 // Routes import
-
 import user from "./routes/user.route.js"
 
+// Routes implementation
 app.use("/api/user", user) // -> https://localhost:3000/api/user/register
 
 

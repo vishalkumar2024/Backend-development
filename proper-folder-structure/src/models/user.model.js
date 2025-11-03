@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 
 const userSchema = new Schema(
     {
-        username: {
+        userName: {
             type: String,
             required: true,
             unique: true,
@@ -27,7 +27,7 @@ const userSchema = new Schema(
         },
         avatar: {
             type: String, // cloudinary url
-            required: true,
+            required: false,
         },
         coverImage: {
             type: String, // cloudinary url
@@ -59,7 +59,7 @@ userSchema.pre("save", async function (next) {
     next()
 })
 
-userSchema.methods.isPasswordCorrect = async function(password){
+userSchema.methods.isPasswordCorrect = async function(password){ // Custom mathod
     return await bcrypt.compare(password, this.password)
 }
 
