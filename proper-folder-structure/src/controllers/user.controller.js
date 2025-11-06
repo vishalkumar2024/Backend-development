@@ -4,6 +4,7 @@ import { ApiError } from "../utils/apiError.js"
 import { uploadOnCloudinary } from "../utils/fileUpload.js";
 
 
+// Function to Register a user
 const registerUser = async (req, res) => {
 
     // 1. Get user details from frontend ( here from postman).
@@ -74,6 +75,8 @@ const registerUser = async (req, res) => {
 
 }
 
+
+// Function to login a user
 const login = async (req, res) => {
 
     // 1. Get user details from frontend ( here from postman).
@@ -84,12 +87,11 @@ const login = async (req, res) => {
     // 6. set cookie
     // 7. return th data
 
-
     const { email, password } = req.body;
 
     try {
 
-        if (!email || !password) { 
+        if (!email || !password) {
             throw new ApiError(404, "All input fields are not filled")
         }
 
@@ -102,7 +104,7 @@ const login = async (req, res) => {
         const isPasswordMatch = await existedUser.isPasswordCorrect(password)
 
         if (!isPasswordMatch) {
-            throw new ApiError(404, 'Password is incorrect')
+            return res.error(400).send("Password is incorrect")
         }
 
         const token = jwt.sign(
@@ -127,8 +129,123 @@ const login = async (req, res) => {
         })
 
     } catch (error) {
-        throw new ApiError(500, "cannot login")
+        throw new ApiError(500, "Cannot login the user ", error)
     }
 }
 
-export { registerUser, login } 
+
+// Function to log out a user
+const logout = (req, res) => {
+    try {
+        const currentuser = req.user
+        res.clearCookie("token")
+
+        return res.status(200).json({
+            success: true,
+            message: currentuser.fullName + " is successfully logged out"
+        })
+    } catch (error) {
+        throw new ApiError(500, "could not logout the user")
+    }
+}
+
+const changeCurrentPassword = async (req, res) => {
+
+    const { oldPassword, newPassword } = req.body
+
+    const user = await UserModel.findById(req.user?._id)
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+
+    if (!isPasswordCorrect) {
+        throw new ApiError(400, "Invalid old password")
+    }
+
+    user.password = newPassword
+    await user.save({ validateBeforeSave: false })
+
+    return res
+        .status(200)
+        .json({
+            success: true,
+            status: 200,
+            message: "Password changed successfully"
+        })
+}
+
+
+const getCurrentUser = async (req, res) => {
+    return res
+        .status(200)
+        .json({
+            success: true,
+            status: 200,
+            data: req.user,
+            message: "Password changed successfully"
+        })
+}
+
+// Function to update user details 
+const updateAccountDetails = async (req, res) => {
+    const { fullName, email } = req.body
+
+    if (!(fullName || email)) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const user = await UserModel.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: { // by using $set, only those data will be updated which the user want to update
+                fullName,
+                email: email
+            }
+        },
+        { new: true }
+
+    ).select("-password")
+
+    return res
+        .status(200)
+        .json({
+            status: 200,
+            data: user,
+            message: "Account details updated successfully"
+        })
+}
+
+// const updateUserAvatar = asyncHandler(async (req, res) => {
+//     const avatarLocalPath = req.file?.path
+
+//     if (!avatarLocalPath) {
+//         throw new ApiError(400, "Avatar file is missing")
+//     }
+
+//     //TODO: delete old image - assignment
+
+//     const avatar = await uploadOnCloudinary(avatarLocalPath)
+
+//     if (!avatar.url) {
+//         throw new ApiError(400, "Error while uploading on avatar")
+
+//     }
+
+//     const user = await User.findByIdAndUpdate(
+//         req.user?._id,
+//         {
+//             $set: {
+//                 avatar: avatar.url
+//             }
+//         },
+//         { new: true }
+//     ).select("-password")
+
+//     return res
+//         .status(200)
+//         .json(
+//             new ApiResponse(200, user, "Avatar image updated successfully")
+//         )
+// })
+
+
+
+export { registerUser, login, logout, changeCurrentPassword, getCurrentUser, updateAccountDetails } 
