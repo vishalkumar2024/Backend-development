@@ -8,7 +8,7 @@ import { uploadOnCloudinary } from "../utils/fileUpload.js";
 const registerUser = async (req, res) => {
 
     // 1. Get user details from frontend ( here from postman).
-    // 2. validation - check if any input field (specially email and username) is empty or in wrong format.
+    // 2. validation - check if any input field (specially email and userName) is empty or in wrong format.
     // 3. Check if user already exist.
     // // 4. Check if user give his avatar image or not
     // // 5. If user gave his avatar image then send it to cloudinary ( to store image files)
@@ -81,7 +81,7 @@ const login = async (req, res) => {
 
     // 1. Get user details from frontend ( here from postman).
     // 2. validation - check if any input field (specially email and password) is empty or in wrong format.
-    // 3. check if email or username is correct or not.
+    // 3. check if email or userName is correct or not.
     // 4. if email is correct, then check the password.
     // 5. assign a jwt token, send it to the client's browser
     // 6. set cookie
@@ -248,4 +248,105 @@ const updateAccountDetails = async (req, res) => {
 
 
 
-export { registerUser, login, logout, changeCurrentPassword, getCurrentUser, updateAccountDetails } 
+// Controller: Get a user's channel profile along with subscription statistics
+const getUserChannelProfile = async (req, res) => {
+    // Extract the username parameter from the request URL
+    const { userName } = req.params;
+
+    if (!userName?.trim()) {
+        throw new ApiError(400, "username is missing");
+    }
+
+    // Aggregation pipeline on the UserModel
+    const channel = await UserModel.aggregate([
+        // 1️⃣ MATCH STAGE — find the user document that matches the given username
+        {
+            $match: {
+                userName: userName.toLowerCase() // ensure case-insensitive comparison
+            }
+        },
+
+        // 2️⃣ LOOKUP STAGE — find all subscriptions where this user is the channel
+        {
+            $lookup: {
+                from: "subscriptions",   // foreign collection (Subscription model)
+                localField: "_id",       // current user's _id
+                foreignField: "channel", // match where this user's _id equals the subscription's 'channel'
+                as: "subscribers"        // add matched documents as an array in 'subscribers'
+            }
+        },
+
+        // 3️⃣ LOOKUP STAGE — find all subscriptions where this user is the subscriber
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",         // current user's _id
+                foreignField: "subscriber",// match where this user's _id equals the subscription's 'subscriber'
+                as: "subscribedTo"         // add matched documents as an array in 'subscribedTo'
+            }
+        },
+
+        // 4️⃣ ADD FIELDS — calculate derived data for the profile
+        {
+            $addFields: {
+                // Count how many users have subscribed to this channel
+                subscribersCount: { $size: "$subscribers" },
+
+                // Count how many channels this user has subscribed to
+                channelsSubscribedToCount: { $size: "$subscribedTo" },
+
+                // Determine if the currently logged-in user has subscribed to this channel
+                isSubscribed: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                        // Check if req.user._id exists in 'subscribers.subscriber' array
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+
+        // 5️⃣ PROJECT STAGE — select which fields to include in the final output
+        {
+            $project: {
+                fullName: 1,
+                username: 1,
+                subscribersCount: 1,
+                channelsSubscribedToCount: 1,
+                isSubscribed: 1,
+                avatar: 1,
+                coverImage: 1,
+                email: 1
+            }
+        }
+    ]);
+
+    // Debug: log the aggregation result
+    console.log("The channel is:", channel);
+
+    // If no matching user (channel) found, throw a 404 error
+    if (!channel?.length) {
+        throw new ApiError(404, "Channel does not exist");
+    }
+
+    // Respond with the first matched document (channel[0])
+    return res
+        .status(200).
+        json({
+            data: channel[0],
+            message: "User channel fetched successfully"
+        });
+};
+
+
+
+export {
+    registerUser,
+    login,
+    logout,
+    changeCurrentPassword,
+    getCurrentUser,
+    updateAccountDetails,
+    getUserChannelProfile
+} 

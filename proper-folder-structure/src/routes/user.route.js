@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login, registerUser, logout, changeCurrentPassword, getCurrentUser, updateAccountDetails } from '../controllers/user.controller.js';
+import { login, registerUser, logout, changeCurrentPassword, getCurrentUser, updateAccountDetails, getUserChannelProfile } from '../controllers/user.controller.js';
 const router = Router();
 import { upload } from "../middlewares/multer.js"
 import { isAuth } from '../middlewares/isAuth.middleware.js';
@@ -25,6 +25,7 @@ router.post('/logout', isAuth, logout)
 router.post('/changePassword', isAuth, changeCurrentPassword)
 router.post('/getCurrentUser', isAuth, getCurrentUser)
 router.post('/updateAccountDetails', isAuth, updateAccountDetails)
+router.post('/getUserChannelProfile/:userName', isAuth, getUserChannelProfile)
 
 
 
