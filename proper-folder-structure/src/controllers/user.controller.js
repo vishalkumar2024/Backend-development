@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { UserModel } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js"
 import { uploadOnCloudinary } from "../utils/fileUpload.js";
-
+import { VideoModel } from "../models/video.model.js"
 
 // Function to Register a user
 const registerUser = async (req, res) => {
@@ -285,7 +285,7 @@ const getUserChannelProfile = async (req, res) => {
                 as: "subscribedTo"         // add matched documents as an array in 'subscribedTo'
             }
         },
-
+ 
         // 4️⃣ ADD FIELDS — calculate derived data for the profile
         {
             $addFields: {
@@ -339,7 +339,39 @@ const getUserChannelProfile = async (req, res) => {
         });
 };
 
+const getVideoDetails = async (req, res) => {
 
+    const { videoId } = req.params
+
+    if (!videoId) {
+        throw new ApiError(404, "Video is not available at this moment!")
+    }
+
+    const video = await VideoModel.aggregate([
+        {
+            $match: {
+                _id: videoId
+            }
+        },
+        {
+            $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "video",
+                as: "TheComment"
+            }
+        },
+        // {
+        //     $lookup: {
+        //         from: "",
+        //         localField: "",
+        //         foreignField: "",
+        //         as: "commentLikes"
+        //     },
+        // }
+    ])
+
+}
 
 export {
     registerUser,
@@ -348,5 +380,6 @@ export {
     changeCurrentPassword,
     getCurrentUser,
     updateAccountDetails,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getVideoDetails
 } 
