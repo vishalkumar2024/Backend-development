@@ -1,3 +1,4 @@
+import { sendVerificationCode, WelcomeEmail } from "../middlewares/email.js";
 import userModel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
@@ -21,12 +22,16 @@ const register = async (req, res) => {
       }
 
       const hashedPassword = bcrypt.hashSync(password, 10)
-
+      const verficationCode = Math.floor(100000 + Math.random() * 900000).toString()
       const user = await userModel.create({
          email,
          password: hashedPassword,
-         userName
+         userName,
+         verficationCode
       })
+
+      await user.save();
+      sendVerificationCode(user.email, verficationCode)
 
       if (user) {
          return res.status(200).json({
@@ -48,4 +53,38 @@ const register = async (req, res) => {
 
 }
 
-export { register }
+const verifyEmail = async (req, res) => {
+   try {
+      const { code } = req.body;
+
+      const user = await userModel.findOne({
+         verficationCode: code,
+      })
+
+      if (!user) {
+         return res.status(400).json({
+            success: false,
+            message: "Invalid or Expired Code"
+         })
+      }
+
+      user.isVerified = true;
+      user.verficationCode = undefined
+      await user.save()
+
+      await WelcomeEmail(user.email, user.userName)
+
+      return res.status(200).json({
+         success: true,
+         message: "Email Verified Successfully",
+      })
+
+   } catch (error) {
+      console.log("Error", error)
+      return res.status(500).json({
+         success: false,
+         message: "Could not verify user email",
+      })
+   }
+}
+export { register, verifyEmail }

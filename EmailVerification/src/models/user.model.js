@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    userName: { 
+    userName: {
         type: String,
         required: true,
     },
@@ -18,7 +18,9 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    verficationCode: String
+    verficationCode: {
+        type: String
+    }
 },
     {
         timestamps: true
@@ -27,4 +29,4 @@ const userSchema = new mongoose.Schema({
 
 const userModel = mongoose.model('user', userSchema)
 
-export default  userModel
+export default userModel
